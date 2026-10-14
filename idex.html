@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Día Cabra — Planificador</title>
+<style>
+:root{--bg:#090a0b;--panel:#111315;--text:#f6f1e7;--muted:#aaa49b;--gold:#c7a467;--gold2:#ead29d;--line:rgba(255,255,255,.10)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 10% 0%,rgba(199,164,103,.14),transparent 30%),#090a0b;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.shell{width:min(1120px,calc(100% - 30px));margin:auto}
+nav{position:sticky;top:0;background:rgba(9,10,11,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:10}
+.nav{height:68px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:900;letter-spacing:.14em}.back{color:var(--gold2);text-decoration:none;font-weight:800}
+.hero{padding:54px 0 20px}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.22em;color:var(--gold2);font-weight:900}
+h1{font-size:clamp(3.3rem,8vw,6.5rem);line-height:.88;letter-spacing:-.06em;margin:10px 0}
+.hero p{color:var(--muted);max-width:760px;line-height:1.7}
+.card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.025));border-radius:24px;padding:24px;margin-bottom:22px}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+label{display:block;color:var(--gold2);font-weight:900;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}
+select{width:100%;background:#121416;color:white;border:1px solid var(--line);border-radius:14px;padding:14px;font:inherit}
+.combo{margin-top:20px;padding:22px;border-radius:20px;background:rgba(199,164,103,.09);border:1px solid rgba(234,210,157,.22)}
+.combo h2{margin:0 0 8px;font-size:2rem}
+.combo p{margin:6px 0;color:var(--muted);line-height:1.55}
+.combo strong{color:#fff}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.stat{border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat span{color:var(--muted);font-size:.82rem}.stat b{display:block;color:var(--gold2);font-size:1.15rem;margin-top:5px}
+.schedule{border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.row{display:grid;grid-template-columns:150px 1fr 1.3fr}
+.row>div{padding:14px 15px;border-bottom:1px solid var(--line)}
+.row>div:not(:last-child){border-right:1px solid var(--line)}
+.row.head{background:rgba(255,255,255,.05);font-weight:900;color:var(--gold2)}
+.row.mountain{background:rgba(199,164,103,.12);box-shadow:inset 5px 0 0 var(--gold2)}
+.time{font-weight:900}.purpose{color:var(--muted)}
+.badge{display:inline-block;margin-left:7px;padding:3px 7px;border:1px solid rgba(234,210,157,.32);border-radius:999px;font-size:.68rem;color:var(--gold2);font-weight:900}
+.tasks h2{margin-top:0}
+.task{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.task input{accent-color:var(--gold)}
+button{border:0;border-radius:999px;background:var(--gold2);color:#18130c;font-weight:900;padding:12px 17px;cursor:pointer}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.secondary{background:transparent;color:#fff;border:1px solid var(--line)}
+@media(max-width:820px){
+ .controls,.summary{grid-template-columns:1fr}
+ .row{grid-template-columns:1fr}
+ .row.head{display:none}
+ .row>div{border-right:0!important}
+}
+</style>
+</head>
+<body>
+<nav><div class="shell nav"><div class="brand">🐐 DÍA CABRA</div><a href="index.html" class="back">← La Cabra</a></div></nav>
+<main class="shell">
+<section class="hero">
+<div class="eyebrow">Tu sistema operativo diario</div>
+<h1>ELIGE.<br>PRIORIZA.<br>SUBE.</h1>
+<p>Combina el tipo de día, la montaña y la intensidad. El horario cambia automáticamente según la combinación.</p>
+</section>
+
+<section class="card">
+<div class="controls">
+<div>
+<label>Tipo de día</label>
+<select id="dayType" onchange="render()">
+<option value="home">🏠 Casa</option>
+<option value="office">🏢 Oficina</option>
+<option value="class">🎓 Clase 6–9 p. m.</option>
+<option value="saturday">🌤️ Sábado</option>
+</select>
+</div>
+<div>
+<label>Montaña</label>
+<select id="mountain" onchange="render()">
+<option value="english">🇬🇧 Inglés / TOEFL</option>
+<option value="leadership">🗣️ Comunicación / Liderazgo</option>
+<option value="ai">🤖 IA / Maestría</option>
+<option value="career">💼 Carrera</option>
+<option value="italian">🇮🇹 Italiano</option>
+<option value="family">🏡 Casa de mi abuelita</option>
+<option value="independence">🗝️ Independencia</option>
+<option value="body">🏋️ Cuerpo</option>
+<option value="finance">💰 Finanzas / Deuda 0</option>
+</select>
+</div>
+<div>
+<label>Intensidad</label>
+<select id="level" onchange="render()">
+<option value="high">🔥 Alta</option>
+<option value="medium" selected>⛰️ Media</option>
+<option value="low">🌿 Baja</option>
+</select>
+</div>
+</div>
+
+<div class="combo">
+<h2 id="comboTitle">Casa + Inglés + Media</h2>
+<p id="comboRule"></p>
+<div class="summary">
+<div class="stat"><span>Despertar</span><b>6:00 a. m.</b></div>
+<div class="stat"><span>Tiempo montaña</span><b id="mountainTime">45 min</b></div>
+<div class="stat"><span>Objetivo</span><b id="goalText">Avance sostenido</b></div>
+<div class="stat"><span>Trabajo foco</span><b>5 horas</b></div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<div class="eyebrow">Horario generado</div>
+<h2>Tu Día Cabra</h2>
+<div id="schedule" class="schedule"></div>
+</section>
+
+<section class="card tasks">
+<div class="eyebrow">Cierres prioritarios</div>
+<h2>Tareas clave</h2>
+<div class="task"><input type="checkbox" id="t1"><span>Pagar a Juan</span></div>
+<div class="task"><input type="checkbox" id="t2"><span>Pagar la luz</span></div>
+<div class="task"><input type="checkbox" id="t3"><span>Revisar si pagué el gas</span></div>
+<div class="task"><input type="checkbox" id="t4"><span>Órdenes de mi abuelita</span></div>
+<div class="task"><input type="checkbox" id="t5"><span>Revisar Garssa</span></div>
+<div class="task"><input type="checkbox" id="t6"><span>Revisar / gestionar póliza</span></div>
+<div class="actions"><button onclick="save()">Guardar Día Cabra</button><button class="secondary" onclick="resetAll()">Reiniciar</button></div>
+</section>
+</main>
+
+<script>
+const mountainNames={
+ english:"Inglés",leadership:"Comunicación",ai:"IA",career:"Carrera",
+ italian:"Italiano",family:"Casa de mi abuelita",independence:"Independencia",
+ body:"Cuerpo",finance:"Finanzas"
+};
+
+const intensity={
+ high:{name:"Alta",time:"90 min",goal:"Avance visible",rule:"Hoy esta montaña manda. Reserva un bloque profundo y usa tiempos complementarios cuando aparezcan."},
+ medium:{name:"Media",time:"45 min",goal:"Avance sostenido",rule:"Hoy la montaña avanza, pero no domina el día. Un bloque concreto y bien hecho es suficiente."},
+ low:{name:"Baja",time:"15 min",goal:"Mantenimiento",rule:"Hoy solo mantienes viva la montaña. Haz una acción mínima y conserva energía para lo prioritario."}
+};
+
+function mountainAction(m){
+ const map={
+  english:"TOEFL: práctica deliberada, listening, reading, speaking o writing.",
+  leadership:"Practicar comunicación asertiva, voz, límites o una conversación difícil.",
+  ai:"Repasar IA, resolver ejercicios o avanzar una tarea de la maestría.",
+  career:"Avanzar una acción concreta de carrera: entrega, perfil, networking o búsqueda.",
+  italian:"Práctica funcional de italiano.",
+  family:"Avanzar una gestión concreta de la casa de mi abuelita.",
+  independence:"Dar un paso concreto hacia mi independencia personal o financiera.",
+  body:"Entrenamiento, movilidad o preparación de hábitos del cuerpo.",
+  finance:"Pago, presupuesto, revisión de deuda o decisión financiera."
+ };
+ return map[m];
+}
+
+function baseRows(type){
+ if(type==="office") return [
+  ["6:00–6:45","🏋️ Ejercicio","Cuerpo"],
+  ["6:45–8:45","🚍 Transporte útil","Aprendizaje / montaña"],
+  ["9:00–12:00","💼 Trabajo profundo","3 h foco"],
+  ["12:00–1:00","🍽️ Almuerzo","Pausa"],
+  ["1:00–3:00","💼 Trabajo profundo","2 h foco"],
+  ["3:00–5:00","🧾 Operativo / reuniones","Cierres"],
+  ["5:00–7:00","🚍 Transporte útil","Aprendizaje ligero"],
+  ["7:30–8:30","🚀 Bloque montaña","Montaña"]
+ ];
+ if(type==="class") return [
+  ["6:00–6:15","🐐 Activación","Inicio"],
+  ["6:15–7:15","🏋️ Ejercicio","Cuerpo"],
+  ["7:15–8:15","🇬🇧 Inglés","Idioma"],
+  ["8:15–9:00","🌿 Preparación","Desayuno / orden"],
+  ["9:00–12:00","💼 Trabajo profundo","3 h foco"],
+  ["12:00–1:00","🍽️ Almuerzo","Pausa"],
+  ["1:00–3:00","💼 Trabajo profundo","2 h foco"],
+  ["3:00–4:00","🤖 IA","Repaso"],
+  ["4:00–4:30","🗣️ Comunicación","Liderazgo"],
+  ["4:30–5:30","🚀 Bloque montaña","Montaña"],
+  ["6:00–9:00","🎓 Clase","Maestría"],
+  ["9:00–9:30","🌙 Cierre","Descanso"]
+ ];
+ if(type==="saturday") return [
+  ["6:00–6:30","🐐 Activación","Desayuno / salida"],
+  ["7:00–12:00","🎓 Clase","Maestría"],
+  ["12:00–1:00","🍽️ Almuerzo","Pausa"],
+  ["1:00–2:00","🌿 Descanso","Recuperación"],
+  ["2:00–3:00","🚀 Bloque montaña","Montaña"],
+  ["3:00–4:00","🇬🇧 Inglés","Idioma"],
+  ["4:00–5:00","🏋️ Ejercicio","Cuerpo"],
+  ["5:00 en adelante","🌙 Vida","Recuperación"]
+ ];
+ return [
+  ["6:00–6:15","🐐 Activación","Inicio"],
+  ["6:15–7:15","🏋️ Ejercicio","Cuerpo"],
+  ["7:15–8:15","🇬🇧 Inglés","Idioma"],
+  ["8:15–9:00","🌿 Preparación","Desayuno / orden"],
+  ["9:00–12:00","💼 Trabajo profundo","3 h foco"],
+  ["12:00–1:00","🍽️ Almuerzo","Pausa"],
+  ["1:00–3:00","💼 Trabajo profundo","2 h foco"],
+  ["3:00–4:00","🤖 IA","Repaso"],
+  ["4:00–4:30","🗣️ Comunicación","Liderazgo"],
+  ["4:30–5:30","🚀 Bloque montaña","Montaña"],
+  ["5:30–6:00","🧾 Cierre","Pendientes"]
+ ];
+}
+
+function render(){
+ const type=document.getElementById("dayType").value;
+ const m=document.getElementById("mountain").value;
+ const lvl=document.getElementById("level").value;
+ const cfg=intensity[lvl];
+
+ const dayName={home:"Casa",office:"Oficina",class:"Clase",saturday:"Sábado"}[type];
+ document.getElementById("comboTitle").textContent=`${dayName} + ${mountainNames[m]} + ${cfg.name}`;
+ document.getElementById("comboRule").innerHTML=`<strong>${cfg.rule}</strong><br>${mountainAction(m)}`;
+ document.getElementById("mountainTime").textContent=cfg.time;
+ document.getElementById("goalText").textContent=cfg.goal;
+
+ let rows=baseRows(type);
+
+ // Actual change to the schedule based on intensity.
+ rows = rows.map(r=>{
+   if(r[2]==="Montaña"){
+     if(lvl==="high"){
+       r[1]=`🔥 ${mountainNames[m]} — bloque profundo`;
+       r[2]=`${cfg.time}. ${mountainAction(m)}`;
+     } else if(lvl==="medium"){
+       r[1]=`⛰️ ${mountainNames[m]} — avance`;
+       r[2]=`${cfg.time}. ${mountainAction(m)}`;
+     } else {
+       r[1]=`🌿 ${mountainNames[m]} — mantenimiento`;
+       r[2]=`${cfg.time}. Acción mínima: ${mountainAction(m)}`;
+     }
+   }
+   return r;
+ });
+
+ // Office commute becomes useful according to mountain + intensity.
+ if(type==="office"){
+   rows=rows.map((r,idx)=>{
+     if(r[1].includes("Transporte útil")){
+       if(lvl==="high" && idx===1) r[2]=`${mountainNames[m]} + aprendizaje activo`;
+       else if(lvl==="medium" && idx===1) r[2]=`${mountainNames[m]} — audio, lectura o repaso`;
+       else if(lvl==="low") r[2]="Contenido ligero / descanso";
+     }
+     return r;
+   });
+ }
+
+ let out='<div class="row head"><div>Hora</div><div>Bloque</div><div>Propósito</div></div>';
+ rows.forEach(r=>{
+   const isMountain=r[1].includes(mountainNames[m]) || r[2].startsWith(mountainNames[m]);
+   out+=`<div class="row ${isMountain?'mountain':''}">
+     <div class="time">${r[0]}</div>
+     <div>${r[1]} ${isMountain?'<span class="badge">MONTAÑA</span>':''}</div>
+     <div class="purpose">${r[2]}</div>
+   </div>`;
+ });
+ document.getElementById("schedule").innerHTML=out;
+ save(false);
+}
+
+function save(show=true){
+ const data={
+  dayType:document.getElementById("dayType").value,
+  mountain:document.getElementById("mountain").value,
+  level:document.getElementById("level").value,
+  tasks:[1,2,3,4,5,6].map(i=>document.getElementById("t"+i).checked)
+ };
+ localStorage.setItem("dia-cabra-v3",JSON.stringify(data));
+ if(show) alert("Día Cabra guardado.");
+}
+function load(){
+ try{
+  const d=JSON.parse(localStorage.getItem("dia-cabra-v3")||"null");
+  if(!d)return;
+  document.getElementById("dayType").value=d.dayType||"home";
+  document.getElementById("mountain").value=d.mountain||"english";
+  document.getElementById("level").value=d.level||"medium";
+  (d.tasks||[]).forEach((v,i)=>document.getElementById("t"+(i+1)).checked=!!v);
+ }catch(e){}
+}
+function resetAll(){
+ localStorage.removeItem("dia-cabra-v3");
+ document.getElementById("dayType").value="home";
+ document.getElementById("mountain").value="english";
+ document.getElementById("level").value="medium";
+ [1,2,3,4,5,6].forEach(i=>document.getElementById("t"+i).checked=false);
+ render();
+}
+[1,2,3,4,5,6].forEach(i=>document.getElementById("t"+i).addEventListener("change",()=>save(false)));
+load();
+render();
+</script>
+</body>
+</html>
